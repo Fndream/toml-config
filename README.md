@@ -23,7 +23,13 @@ double-value = 0.0
 array = [1, 2, 3]
 mult-array = [[10, 10], [20, 20], [30, 30]]
 ```
+
 ### 手动加载
+<details>
+<summary>
+展开
+</summary>
+
 ```java
 // 1.创建root节点的AppToml类，继承TomlConfig
 public class AppToml extends TomlConfig {
@@ -154,8 +160,18 @@ public class Main {
     }
 }
 ```
+</details>
 
 ### 自动加载
+<details>
+<summary>
+展开
+</summary>
+
+下面的例子中，使用Toml后缀的类表示一个.toml文件的root节点，它一般包含着很多个Config表，表示着这个.toml文件中都含有哪些配置分类。使用Config后缀的类表示Toml中的其中一个配置表，定义具体的配置项。
+
+如果很多表中存在相同的key，可以为其创建父类，并且父类和子类可以使用不同的加载方式(手动/自动)实现。
+
 ```java
 // 使用自动加载则继承AutoLoadTomlConfig
 public class AppToml extends AutoLoadTomlConfig {
@@ -287,11 +303,14 @@ public class Main {
 }
 ```
 
-> **例子中，使用Toml后缀的类表示一个.toml文件的root节点，它一般包含着很多个Config表，表示着这个.toml文件中都含有哪些配置分类。使用Config后缀的类表示Toml中的其中一个配置表，定义具体的配置项。**
-
-> **如果很多表中存在相同的key，可以为其创建父类，并且父类和子类可以使用不同的加载方式(手动/自动)实现。**
+</details>
 
 ### 单例配置
+<details>
+<summary>
+展开
+</summary>
+
 ```java
 // 为AppToml添加单例常量
 public class AppToml extends AutoLoadTomlConfig {
@@ -350,8 +369,14 @@ public class Main {
     }
 }
 ```
+</details>
 
 ### 配置重载
+<details>
+<summary>
+展开
+</summary>
+
 ```java
 // 将Toml类继承自AutoReloadToml
 public class AppToml extends AutoReloadToml {
@@ -362,8 +387,14 @@ public class AppToml extends AutoReloadToml {
     private static AppToml INSTANCE = TomlUtil.readConfig("config/app.toml", AppToml.class, true);
 }
 ```
+</details>
 
 ### 完整实例
+<details>
+<summary>
+展开
+</summary>
+
 ```java
 public class AppToml extends AutoReloadToml {
     @Reload(value = "config/app.toml", autoReload = true)
@@ -476,3 +507,6 @@ public class Main {
     }
 }
 ```
+</details>
+
+---
