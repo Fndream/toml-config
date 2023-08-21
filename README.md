@@ -287,7 +287,9 @@ public class Main {
 }
 ```
 
-> **在上面的例子中，我们使用以Toml为后缀的类表示一个.toml文件的root节点，它一般包含着很多个Config表，表示着这个.toml文件中都含有哪些配置分类。使用Config为后缀的类表示Toml中的其中一个配置表，定义具体的配置项。**
+> **例子中，使用Toml后缀的类表示一个.toml文件的root节点，它一般包含着很多个Config表，表示着这个.toml文件中都含有哪些配置分类。使用Config后缀的类表示Toml中的其中一个配置表，定义具体的配置项。**
+
+> **如果很多表中存在相同的key，可以为其创建父类，并且父类和子类可以使用不同的加载方式(手动/自动)实现。**
 
 ### 单例配置
 ```java
@@ -358,5 +360,119 @@ public class AppToml extends AutoReloadToml {
     // 重载后再通过AppToml.getInstance()获取到的便是新的实例。
     @Reload(value = "config/app.toml", autoReload = true)
     private static AppToml INSTANCE = TomlUtil.readConfig("config/app.toml", AppToml.class, true);
+}
+```
+
+### 完整实例
+```java
+public class AppToml extends AutoReloadToml {
+    @Reload(value = "config/app.toml", autoReload = true)
+    private static AppToml INSTANCE = TomlUtil.readConfig("config/app.toml", AppToml.class, true);
+
+    @TableField(value = "switch", topComment = "switch")
+    protected boolean switched;
+
+    @TableField(value = "strategy", topComment = "strategy")
+    protected Strategy strategy = Strategy.NO_ONE;
+
+    @TableField(value = "datasource", topComment = {"datasource", "dbsource"})
+    protected DataSourceConfig datasourceConfig = DataSourceConfig.DEFAULT;
+
+    @TableField(value = "test", topComment = "test")
+    protected TestConfig testConfig = TestConfig.DEFAULT;
+
+    private AppToml() {
+        super(null);
+    }
+
+    private AppToml(TomlTable source) {
+        super(source);
+        this.load(AppToml.class);
+    }
+    
+    // getter setter
+}
+
+public class DataSourceConfig extends AutoLoadTomlConfig {
+    public static final DataSourceConfig DEFAULT = new DataSourceConfig();
+
+    @TableField(required = true, rightComment = "url")
+    protected String url = "";
+
+    @TableField(required = true, rightComment = "username")
+    protected String username = "";
+
+    @TableField(required = true, rightComment = "password")
+    protected String password = "";
+
+    public DataSourceConfig() {
+        super(null);
+    }
+
+    public DataSourceConfig(TomlTable source) {
+        super(source);
+        this.load(DataSourceConfig.class);
+    }
+
+    public static DataSourceConfig getInstance() {
+        return AppToml.getInstance().getDatasourceConfig();
+    }
+
+    // getter setter
+}
+
+public class TestConfig extends AutoLoadTomlConfig {
+    public static final TestConfig DEFAULT = new TestConfig();
+
+    protected int intValue;
+    protected long longValue;
+    protected double doubleValue;
+    protected int[] array = new int[0];
+    protected int[][] multArray = new int[0][];
+
+    public TestConfig() {
+        super(null);
+    }
+
+    public TestConfig(TomlTable source) {
+        super(source);
+        this.load(TestConfig.class);
+    }
+
+    public static TestConfig getInstance() {
+        return AppToml.getInstance().getTestConfig();
+    }
+
+    // getter setter
+}
+
+public class Main {
+    public static void main(String[] args) {
+        AppToml appToml = AppToml.getInstance();
+        System.out.println(appToml.toToml());
+        /*      
+                # switch
+                switch = true
+                
+                # strategy
+                strategy = "NO_ONE"
+                
+                
+                # datasource
+                # dbsource
+                [datasource]
+                url = "url"  # url
+                username = "username"  # username
+                password = "password"  # password
+                
+                # test
+                [test]
+                int-value = 2147483647
+                long-value = 2147483648
+                double-value = 0.0
+                array = [1, 2, 3]
+                mult-array = [[10, 10], [20, 20], [30, 30]]
+         */
+    }
 }
 ```
