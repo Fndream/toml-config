@@ -20,7 +20,7 @@ public enum KeyGenerator {
     UNDERLINE(NamingUtil::lowerCamelCaseToUnderline),
 
     /**
-     * 横线 "int-value" (默认)
+     * 横线 "int-value"
      */
     HYPHENATED(NamingUtil::lowerCamelCaseToHyphenated);
 

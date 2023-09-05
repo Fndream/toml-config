@@ -4,10 +4,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author Fndream
- */
-public class TomlHelper {
+class TomlHelper {
     public static List<?> arrayToList(Object array) {
         List<Object> list = new ArrayList<>();
         for (int i = 0; i < Array.getLength(array); i++) {

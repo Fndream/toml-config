@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.function.*;
 
 /**
- * 对Tomlj库的TomlTable类的一系列Getter方法封装，以及读取和写出TOML文件
+ * 对Tomlj库中{@link TomlTable}类的一系列Getter方法封装，以及读取和写出TOML文件的方法
  *
  * @author Fndream
  */
@@ -32,10 +32,20 @@ public class TomlUtil {
     private TomlUtil() {
     }
 
+    /**
+     * 解析为配置源
+     * @param toml Toml字符串
+     * @return {@link TomlTable} 实例
+     */
     public static TomlTable parseTable(String toml) {
         return Toml.parse(toml);
     }
 
+    /**
+     * 解析为配置源
+     * @param file 文件
+     * @return {@link TomlTable} 实例
+     */
     public static TomlTable parseTable(File file) {
         try {
             return Toml.parse(file.toPath());
@@ -44,6 +54,11 @@ public class TomlUtil {
         }
     }
 
+    /**
+     * 解析为配置源
+     * @param path 文件路径
+     * @return {@link TomlTable} 实例
+     */
     public static TomlTable parseTable(Path path) {
         try {
             return Toml.parse(path);
@@ -52,26 +67,65 @@ public class TomlUtil {
         }
     }
 
+    /**
+     * 读取配置文件
+     * @param path 文件路径
+     * @param clazz 配置类，继承自 {@link TomlConfig}
+     * @return 指定的配置类实例
+     */
     public static <T> T readConfig(String path, Class<T> clazz) {
         return readConfig(Paths.get(path), clazz, false);
     }
 
+    /**
+     * 读取配置文件
+     * @param file 文件
+     * @param clazz 配置类，继承自 {@link TomlConfig}
+     * @return 指定的配置类实例
+     */
     public static <T> T readConfig(File file, Class<T> clazz) {
         return readConfig(file.toPath(), clazz, false);
     }
 
+    /**
+     * 读取配置文件
+     * @param path 文件路径
+     * @param clazz 配置类，继承自 {@link TomlConfig}
+     * @return 指定的配置类实例
+     */
     public static <T> T readConfig(Path path, Class<T> clazz) {
         return readConfig(path, clazz, false);
     }
 
+    /**
+     * 读取配置文件
+     * @param path 文件路径
+     * @param clazz 配置类，继承自 {@link TomlConfig}
+     * @param create 如果文件不存在，是否创建默认配置文件
+     * @return 指定的配置类实例。当文件不存在时，返回默认配置实例。
+     */
     public static <T> T readConfig(String path, Class<T> clazz, boolean create) {
         return readConfig(Paths.get(path), clazz, create);
     }
 
+    /**
+     * 读取配置文件
+     * @param file 文件
+     * @param clazz 配置类，继承自 {@link TomlConfig}
+     * @param create 如果文件不存在，是否创建默认配置文件
+     * @return 指定的配置类实例。当文件不存在时，返回默认配置实例。
+     */
     public static <T> T readConfig(File file, Class<T> clazz, boolean create) {
         return readConfig(file.toPath(), clazz, create);
     }
 
+    /**
+     * 读取配置文件
+     * @param path 文件路径
+     * @param clazz 配置类，继承自 {@link TomlConfig}
+     * @param create 如果文件不存在，是否创建默认配置文件
+     * @return 指定的配置类实例。如果文件不存在，返回默认配置实例。
+     */
     public static <T> T readConfig(Path path, Class<T> clazz, boolean create) {
         try {
             if (!path.toFile().exists() && create) {
@@ -84,6 +138,12 @@ public class TomlUtil {
         }
     }
 
+    /**
+     * 解析配置类
+     * @param source 配置源
+     * @param clazz 配置类
+     * @return 通过配置源构造的配置类实例。如果配置源为null，构造无参配置类实例返回
+     */
     @NotNull
     public static <T> T parseConfig(TomlTable source, Class<T> clazz) {
         if (!TomlConfig.class.isAssignableFrom(clazz)) {
@@ -105,34 +165,86 @@ public class TomlUtil {
         }
     }
 
+    /**
+     * 写入配置文件
+     * @param path 文件路径
+     * @param config 配置类实例
+     * @return 被写入的文件
+     */
     public static File writeConfig(String path, TomlConfig config) {
         return writeConfig(new File(path), config, KeyGenerator.HYPHENATED);
     }
 
+    /**
+     * 写入配置文件
+     * @param path 文件路径
+     * @param config 配置类实例
+     * @return 被写入的文件
+     */
     public static File writeConfig(Path path, TomlConfig config) {
         return writeConfig(path.toFile(), config, KeyGenerator.HYPHENATED);
     }
 
+    /**
+     * 写入配置文件
+     * @param file 文件
+     * @param config 配置类实例
+     * @return 被写入的文件
+     */
     public static File writeConfig(File file, TomlConfig config) {
         return writeConfig(file, config, KeyGenerator.HYPHENATED);
     }
 
+    /**
+     * 写入配置文件
+     * @param path 文件路径
+     * @param config 配置类实例
+     * @param keyGenerator key生成方式，见 {@link KeyGenerator}
+     * @return 被写入的文件
+     */
     public static File writeConfig(String path, TomlConfig config, KeyGenerator keyGenerator) {
         return writeConfig(new File(path), config, keyGenerator);
     }
 
+    /**
+     * 写入配置文件
+     * @param path 文件路径
+     * @param config 配置类实例
+     * @param keyGenerator key生成方式，见 {@link KeyGenerator}
+     * @return 被写入的文件
+     */
     public static File writeConfig(Path path, TomlConfig config, KeyGenerator keyGenerator) {
         return writeConfig(path.toFile(), config, keyGenerator);
     }
 
+    /**
+     * 写入配置文件
+     * @param file 文件
+     * @param config 配置类实例
+     * @param keyGenerator key生成方式，见 {@link KeyGenerator}
+     * @return 被写入的文件
+     */
     public static File writeConfig(File file, TomlConfig config, KeyGenerator keyGenerator) {
         return writeStringToFile(file, config.toToml(keyGenerator));
     }
 
+    /**
+     * 将字符串写入到文件
+     * @param file 文件
+     * @param str 字符串
+     * @return 被写入的文件
+     */
     public static File writeStringToFile(File file, String str) {
         return writeStringToFile(file, str, false);
     }
 
+    /**
+     * 将字符串写入到文件
+     * @param file 写入的文件
+     * @param str 字符串
+     * @param append true，以追加形式写入；false，以覆盖形式写入
+     * @return 被写入的文件
+     */
     public static File writeStringToFile(File file, String str, boolean append) {
         try {
             File presentFile = checkCreateFile(file);
@@ -146,6 +258,9 @@ public class TomlUtil {
         }
     }
 
+    /**
+     * 获取值
+     */
     @Nullable
     public static Object getValue(TomlTable table, String key) {
         if (table == null) {
@@ -159,7 +274,6 @@ public class TomlUtil {
     public static <T> T getTomlConfig(TomlTable table, String key, Class<T> clazz) {
         return getTomlConfig(table, key, clazz, () -> null);
     }
-
 
     public static <T> T getTomlConfig(TomlTable table, String key, Class<T> clazz, Supplier<T> defaultValue) {
         if (table == null) {
@@ -328,7 +442,7 @@ public class TomlUtil {
     }
 
     /**
-     * 获取一维或N维数组
+     * 获取N维数组
      * <blockquote>
      * <pre>
      * int[] array = getArray(table, "intArray", int[].class);
@@ -336,12 +450,10 @@ public class TomlUtil {
      * </pre>
      * </blockquote>
      *
-     * @param table 配置源
-     * @param key   键名
-     * @param clazz 数组类，支持int[]、long[]、double[]、String[]
-     * @return 新数组；若配置源中未定义key，将返回null
-     * @throws TomlInvalidTypeException 如果值的类型不匹配
-     * @throws IllegalArgumentException 如果指定的数组类型维度与值的数组维度不一致
+     * @param table 表
+     * @param key   键
+     * @param clazz 数组类型：<code>int[].class long[].class</code>
+     * @return 数组或null
      */
     @Nullable
     public static <T> T getArray(TomlTable table, String key, Class<T> clazz) {
@@ -349,7 +461,7 @@ public class TomlUtil {
     }
 
     /**
-     * 获取一维或N维数组
+     * 获取N维数组
      * <blockquote>
      * <pre>
      * int[] array = getArray(table, "intArray", int[].class, new int[]{0, 1, 2});
@@ -358,13 +470,11 @@ public class TomlUtil {
      * </pre>
      * </blockquote>
      *
-     * @param table        配置源
-     * @param key          键名
-     * @param clazz        数组类，支持int[]、long[]、double[]、String[]
+     * @param table        表
+     * @param key          键
+     * @param clazz        数组类型：<code>int[].class long[].class</code>
      * @param defaultValue 默认值
-     * @return 新数组；若配置源中未定义key，将返回默认值
-     * @throws TomlInvalidTypeException 如果值的类型不匹配
-     * @throws IllegalArgumentException 如果指定的数组类型维度与值的数组维度不一致
+     * @return 数组或默认值
      */
     public static <T> T getArray(TomlTable table, String key, Class<T> clazz, Supplier<T> defaultValue) {
         Object value = table.get(key);
@@ -418,10 +528,25 @@ public class TomlUtil {
         return getArray(table, key, String[].class, defaultValue);
     }
 
+    /**
+     * 获取List
+     * @param table 表
+     * @param key 键
+     * @param arrayClazz 数组类型：<code>int[].class long[].class</code>
+     * @return ArrayList实例或null
+     */
     public static List<?> getList(TomlTable table, String key, Class<?> arrayClazz) {
         return getList(table, key, arrayClazz, () -> null);
     }
 
+    /**
+     * 获取List
+     * @param table 表
+     * @param key 键
+     * @param arrayClazz 数组类型：<code>int[].class long[].class</code>
+     * @param defaultValue 默认值
+     * @return ArrayList实例或默认值
+     */
     public static List<?> getList(TomlTable table, String key, Class<?> arrayClazz, Supplier<List<?>> defaultValue) {
         Object array = getArray(table, key, arrayClazz);
         return array != null ? TomlHelper.arrayToList(array) : defaultValue.get();

@@ -11,7 +11,7 @@ import java.lang.reflect.Modifier;
 import static com.fndream.tomlconfig.ConfigFileWatcher.CONFIG_FILE_WATCHER;
 
 /**
- * 支持重载的配置，该类只应当被表示TOML文件的类继承
+ * 支持重载的配置类
  *
  * @author Fndream
  */
@@ -36,6 +36,9 @@ public abstract class AutoReloadToml extends AutoLoadTomlConfig {
         }
     }
 
+    /**
+     * 赋值新的配置类实例给被 @{@link Reload} 注解的单例字段
+     */
     public void reload() {
         if (this.field == null) {
             findReloadFieldArgument();

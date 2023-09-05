@@ -1,12 +1,16 @@
 package com.fndream.tomlconfig.annotation;
 
+import com.fndream.tomlconfig.AutoLoadTomlConfig;
+import com.fndream.tomlconfig.TomlConfig;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 设置字段加载与写出时的行为
+ * 设置字段加载与写出时的行为。<br/>
+ * 加载行为作用于自动加载 {@link AutoLoadTomlConfig}，写出行为仅作用于 {@link TomlConfig}.toToml()方法
  * @author Fndream
  */
 @Target(ElementType.FIELD)
@@ -18,7 +22,7 @@ public @interface TableField {
     String value() default "";
 
     /**
-     * 仅在加载时生效：是否必需
+     * 加载时生效：字段是否必需存在
      */
     boolean required() default false;
 
@@ -38,29 +42,29 @@ public @interface TableField {
     boolean ignoreWrite() default false;
 
     /**
-     * 仅在加载时生效：默认值，支持int、long、double、boolean、String、Enum、array/List、LocalDate、LocalDateTime类型的字符串表达式。
-     * @deprecated 存在众多兼容问题且类型不完善，代码不清晰，建议使用为字段赋值初始值的方式设置默认值。
+     * 加载时生效：默认值，支持int、long、double、boolean、String、Enum、array/List、LocalDate、LocalDateTime类型的字符串表达式。
+     * @deprecated 存在众多功能之间兼容问题，建议为字段赋值初始值作为设置默认值的方式。
      */
     @Deprecated
     String defaultValue() default "";
 
     /**
-     * 仅在写出时生效：在字段上方的注释
+     * 写出时生效：在字段上方的注释
      */
     String[] topComment() default {};
 
     /**
-     * 仅在写出时生效：在字段右侧的注释
+     * 写出时生效：在字段右侧的注释
      */
     String[] rightComment() default {};
 
     /**
-     * 仅在写出时生效：写出top注释前添加空行的数量
+     * 写出时生效：写出top注释前添加空行的数量
      */
     int prefixLine() default 0;
 
     /**
-     * 仅在写出时生效：写出top注释和键值对后添加空行的数量
+     * 写出时生效：写出top注释和键值对后添加空行的数量
      */
     int suffixLine() default 1;
 }

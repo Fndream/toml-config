@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * 可自动加载配置
+ * 自动加载配置类
  *
  * @author Fndream
  */
@@ -25,7 +25,7 @@ public abstract class AutoLoadTomlConfig extends TomlConfig {
     }
 
     /**
-     * 加载数据源到字段，不包含父类字段。
+     * 加载数据源到字段，不包含父类字段
      *
      * @param clazz 要加载的类
      */
