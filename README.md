@@ -1,11 +1,11 @@
 # TomlConfig
-TomlConfig是一个基于[Tomlj](https://github.com/tomlj/tomlj)封装的高效Toml配置文件库，具有以下特性：
+TomlConfig是一个基于[Tomlj](https://github.com/tomlj/tomlj)封装的高效Toml配置文件库。它具有以下特性：
 
-* 自动创建默认配置文件、自动key映射、整洁的Toml配置格式输出。
-* 必需key、默认值、行上注释、行右注释、自动重载等功能。
-* int、long、double、String、Enum、array、多维数组等基本类型映射、List、多维List、Map等集合映射。
+* 仅需定义配置类，自动加载与写入到文件。
+* 必需值、默认值、行上注释、行右注释、单例配置重载等功能。
+* 支持int、long、double、String、Enum、array、多维数组、List、多维List、Map等类型映射。
 
-## 快速上手
+### 快速上手
 app.toml
 ```toml
 switch = true
@@ -23,6 +23,129 @@ double-value = 0.0
 array = [1, 2, 3]
 mult-array = [[10, 10], [20, 20], [30, 30]]
 ```
+app表/root节点
+```java
+public class AppToml extends AutoReloadToml {
+    @Reload(value = "config/app.toml", autoReload = true)
+    private static AppToml INSTANCE = TomlUtil.readConfig("config/app.toml", AppToml.class, true);
+
+    @TableField(value = "switch", topComment = "switch")
+    protected boolean switched;
+
+    @TableField(topComment = "strategy")
+    protected Strategy strategy = Strategy.NO_ONE;
+
+    @TableField(topComment = "datasource")
+    protected DataSourceConfig datasourceConfig = DataSourceConfig.DEFAULT;
+
+    @TableField(topComment = "test")
+    protected TestConfig testConfig = TestConfig.DEFAULT;
+
+    public AppToml() {
+        super(null);
+    }
+
+    public AppToml(TomlTable source) {
+        super(source);
+        this.load(AppToml.class);
+    }
+    
+    // getter setter
+}
+```
+
+DataSource表
+
+```java
+public class DataSourceConfig extends AutoLoadTomlConfig {
+    public static final DataSourceConfig DEFAULT = new DataSourceConfig();
+
+    @TableField(required = true, rightComment = "url")
+    protected String url = "";
+
+    @TableField(required = true, rightComment = "username")
+    protected String username = "";
+
+    @TableField(required = true, rightComment = "password")
+    protected String password = "";
+
+    public DataSourceConfig() {
+        super(null);
+    }
+
+    public DataSourceConfig(TomlTable source) {
+        super(source);
+        this.load(DataSourceConfig.class);
+    }
+
+    public static DataSourceConfig getInstance() {
+        return AppToml.getInstance().getDatasourceConfig();
+    }
+
+    // getter setter
+}
+```
+Test表
+
+```java
+public class TestConfig extends AutoLoadTomlConfig {
+    public static final TestConfig DEFAULT = new TestConfig();
+
+    protected int intValue;
+    protected long longValue;
+    protected double doubleValue;
+    protected int[] array = new int[0];
+    protected int[][] multArray = new int[0][];
+
+    public TestConfig() {
+        super(null);
+    }
+
+    public TestConfig(TomlTable source) {
+        super(source);
+        this.load(TestConfig.class);
+    }
+
+    public static TestConfig getInstance() {
+        return AppToml.getInstance().getTestConfig();
+    }
+
+    // getter setter
+}
+```
+
+使用
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        AppToml appToml = AppToml.getInstance();
+        System.out.println(appToml.toToml());
+        /*      
+                # switch
+                switch = true
+                
+                # strategy
+                strategy = "NO_ONE"
+                
+                
+                # datasource
+                [datasource]
+                url = "url"  # url
+                username = "username"  # username
+                password = "password"  # password
+                
+                # test
+                [test]
+                int-value = 2147483647
+                long-value = 2147483648
+                double-value = 0.0
+                array = [1, 2, 3]
+                mult-array = [[10, 10], [20, 20], [30, 30]]
+         */
+    }
+}
+```
 
 ### 手动加载
 <details>
@@ -31,16 +154,12 @@ mult-array = [[10, 10], [20, 20], [30, 30]]
 </summary>
 
 ```java
-// 1.创建root节点的AppToml类，继承TomlConfig
+// 1.创建root节点的AppToml类，继承TomlConfig类
 public class AppToml extends TomlConfig {
-    // 指定key
+    // 指定与Java关键字冲突的key
     @TableField("switch")
     protected boolean switched;
-    
-    // 枚举类型
     protected Strategy strategy;
-    
-    // 子表
     protected DataSourceConfig datasourceConfig;
     protected TestConfig testConfig;
 
@@ -180,14 +299,14 @@ public class AppToml extends AutoLoadTomlConfig {
     @TableField(value = "switch", topComment = "switch")
     protected boolean switched = true;
     
-    @TableField(value = "strategy", topComment = "strategy")
+    @TableField(topComment = "strategy")
     protected Strategy strategy = Strategy.NO_ONE;
 
     // 可以使用数组的形式创建多行注释，当然也可以使用 \n 或 """
-    @TableField(value = "datasource", topComment = {"datasource", "dbsource"})
+    @TableField(topComment = {"datasource", "dbsource"})
     protected DataSourceConfig datasourceConfig = DataSourceConfig.DEFAULT;
 
-    @TableField(value = "test", topComment = "test")
+    @TableField(topComment = "test")
     protected TestConfig testConfig = TestConfig.DEFAULT;
 
     // 默认配置
@@ -403,13 +522,13 @@ public class AppToml extends AutoReloadToml {
     @TableField(value = "switch", topComment = "switch")
     protected boolean switched;
 
-    @TableField(value = "strategy", topComment = "strategy")
+    @TableField(topComment = "strategy")
     protected Strategy strategy = Strategy.NO_ONE;
 
-    @TableField(value = "datasource", topComment = {"datasource", "dbsource"})
+    @TableField(topComment = "datasource")
     protected DataSourceConfig datasourceConfig = DataSourceConfig.DEFAULT;
 
-    @TableField(value = "test", topComment = "test")
+    @TableField(topComment = "test")
     protected TestConfig testConfig = TestConfig.DEFAULT;
 
     private AppToml() {
@@ -490,7 +609,6 @@ public class Main {
                 
                 
                 # datasource
-                # dbsource
                 [datasource]
                 url = "url"  # url
                 username = "username"  # username
@@ -508,5 +626,3 @@ public class Main {
 }
 ```
 </details>
-
----
